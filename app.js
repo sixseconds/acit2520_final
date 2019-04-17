@@ -1,6 +1,7 @@
 const express = require("express");
 const hbs = require("hbs");
 const currency = require("./currency");
+const nasa = require("./nasa_api");
 //const fs = require("fs");
 
 const port = process.env.PORT || 8080;
@@ -47,6 +48,20 @@ hbs.registerHelper("makeLinks", currentEndpoint => {
     return links.join(`\n`);
 });
 
+hbs.registerHelper("makeImages", imageLinks => {
+    let count = 0;
+    let images = imageLinks.map(link => {
+        if (count === 0) {
+            count++;
+            return `<div class="carousel-item active" role="listbox" style=" width:100%; height: 500px !important;"><img class="d-block w-100" src="${link}"/></div>`;
+        } else {
+            return `<div class="carousel-item" role="listbox" style=" width:100%; height: 500px !important;"><img class="d-block w-100" src="${link}"/></div>`;
+        }
+    });
+
+    return images.join(`\n`);
+});
+
 /*
 var convert = (value, baseCurrency, newCurrencies) => {
     currency.convert(value, baseCurrency, newCurrencies).then(conversion => {
@@ -85,24 +100,60 @@ app.use((request, response, next) => {
 */
 
 app.get("/", async (request, response) => {
-    response.render("index.hbs", {
-        title: pages[request.route.path],
-        currentEndpoint: request.route.path,
-        output: "output"
-    });
+    try {
+        let imageLinks = await nasa.getImages("mars");
+
+        response.render("index.hbs", {
+            title: pages[request.route.path],
+            currentEndpoint: request.route.path,
+            output: "test",
+            imageLinks: imageLinks
+        });
+    } catch (error) {
+        response.render("index.hbs", {
+            title: pages[request.route.path],
+            currentEndpoint: request.route.path,
+            output: `${error.message}`
+        });
+    }
     //console.log(response);
 });
 
 app.post("/", async (request, response) => {
+    let nasaSearch = request.body.nasaSearch;
+    console.log(nasaSearch);
+    try {
+        let imageLinks = await nasa.getImages(nasaSearch);
+
+        response.render("index.hbs", {
+            title: pages[request.route.path],
+            currentEndpoint: request.route.path,
+            output: "output",
+            imageLinks: imageLinks
+        });
+    } catch (error) {
+        response.render("index.hbs", {
+            title: pages[request.route.path],
+            currentEndpoint: request.route.path,
+            output: `${error.message}`
+        });
+    }
+});
+
+/*
+app.post("/", async (request, response) => {
     let baseCurrency = request.body.baseCurrency.toUpperCase();
-    let newCurrencies = request.body.newCurrencies.toUpperCase().split(" ").join(",");
+    let newCurrencies = request.body.newCurrencies
+        .toUpperCase()
+        .split(" ")
+        .join(",");
     let value = Number(request.body.value);
-    
+
     /*
     console.log(value);
     console.log(baseCurrency);
     console.log(newCurrencies);
-    */
+    
 
     try {
         let conversion = await currency.getFinalConversion(
@@ -125,13 +176,13 @@ app.post("/", async (request, response) => {
         });
     }
 
-    /*
+    
     response.render("index.hbs", {
         title: pages[request.route.path],
         currentEndpoint: request.route.path,
         output: conversion
     });
-    */
+    
 
     //console.log(response);
 });
