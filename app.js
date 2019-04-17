@@ -1,7 +1,7 @@
 const express = require("express");
 const hbs = require("hbs");
 const currency = require("./currency");
-const fs = require("fs");
+//const fs = require("fs");
 
 const port = process.env.PORT || 8080;
 
@@ -13,6 +13,14 @@ const value = 20;
 
 const app = express();
 
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+app.use(
+    bodyParser.urlencoded({
+        extended: true
+    })
+);
+
 hbs.registerPartials(__dirname + "/views/partials");
 app.set("view engine", "hbs");
 app.use(express.static(__dirname + "/public"));
@@ -22,7 +30,7 @@ hbs.registerHelper("getCurrentYear", () => {
 });
 
 var pages = {
-    "/index": "index",
+    "/index": "final",
     "/about": "about me",
     "/convert": "convert money here"
 };
@@ -37,10 +45,10 @@ hbs.registerHelper("makeLinks", currentEndpoint => {
     return links.join(`\n`);
 });
 
-hbs.registerHelper("converter", (value, baseCurrency, newCurrencies) => {
+var convert = (value, baseCurrency, newCurrencies) => {
     currency.convert(value, baseCurrency, newCurrencies).then(conversion => {
         console.log(conversion);
-        console.log(typeof value)
+        console.log(typeof value);
 
         if (typeof value === "number") {
             return conversion;
@@ -48,8 +56,9 @@ hbs.registerHelper("converter", (value, baseCurrency, newCurrencies) => {
             return "Invalid conversion!";
         }
     });
-});
+};
 
+/*
 app.use((request, response, next) => {
     let time = new Date().toString();
     let log = `${time}: ${request.method} ${request.url}`;
@@ -60,6 +69,7 @@ app.use((request, response, next) => {
     });
     next();
 });
+*/
 
 /*
 app.use((request, response, next) => {
@@ -69,14 +79,59 @@ app.use((request, response, next) => {
 });
 */
 
-app.get("/index", (request, response) => {
+app.get("/index", async (request, response) => {
     response.render("index.hbs", {
         title: pages[request.route.path],
-        currentEndpoint: request.route.path
+        currentEndpoint: request.route.path,
+        output: "output"
     });
-    console.log(response.headers);
+    //console.log(response);
 });
 
+app.post("/index", async (request, response) => {
+    let baseCurrency = request.body.baseCurrency.toUpperCase();
+    let newCurrencies = request.body.newCurrencies.toUpperCase().split(" ").join(",");
+    let value = Number(request.body.value);
+    
+    /*
+    console.log(value);
+    console.log(baseCurrency);
+    console.log(newCurrencies);
+    */
+
+    try {
+        let conversion = await currency.getFinalConversion(
+            value,
+            baseCurrency,
+            newCurrencies
+        );
+        //console.log(conversion);
+
+        response.render("index.hbs", {
+            title: pages[request.route.path],
+            currentEndpoint: request.route.path,
+            output: conversion
+        });
+    } catch (error) {
+        response.render("index.hbs", {
+            title: pages[request.route.path],
+            currentEndpoint: request.route.path,
+            output: `${error.message}`
+        });
+    }
+
+    /*
+    response.render("index.hbs", {
+        title: pages[request.route.path],
+        currentEndpoint: request.route.path,
+        output: conversion
+    });
+    */
+
+    //console.log(response);
+});
+
+/*
 app.get("/about", (request, response) => {
     response.render("about.hbs", {
         title: pages[request.route.path],
@@ -84,6 +139,7 @@ app.get("/about", (request, response) => {
     });
     console.log(response.headers);
 });
+
 
 app.get("/convert", (request, response) => {
     response.render("convert.hbs", {
@@ -94,6 +150,7 @@ app.get("/convert", (request, response) => {
         value: 20
     });
 });
+*/
 
 app.listen(port, () => {
     console.log(`Server is up on port ${port}`);

@@ -6,19 +6,28 @@ const newCurrencies = ["CAD", "JPY", "GBP", "PLN"];
 const value = 20;
 */
 
-const getExchangeRates = async (currency, newCurrencies) => {
-    const exchangeAPI = "https://api.exchangeratesapi.io/latest?base=";
-    const searchCurrencies = "&symbols=" + newCurrencies.join(",");
-    let exchange = await axios.get(exchangeAPI + currency + searchCurrencies);
+var getExchangeRates = async (currency, newCurrencies) => {
+    const exchangeAPI = `https://api.exchangeratesapi.io/latest?symbols=${newCurrencies}&base=${currency}`;
+    //const searchCurrencies = "&symbols=" + newCurrencies//.join(",");
+
+    //console.log(exchangeAPI);
+    let exchange = await axios.get(exchangeAPI);
+
+    //console.log(exchange.data.rates);
     return exchange.data.rates;
 };
 
-const getCountries = currency => {
-    const countryAPI = "https://restcountries.eu/rest/v2/currency/";
-    return axios.get(countryAPI + currency);
+var getCountries = async currency => {
+    const countryAPI = `https://restcountries.eu/rest/v2/currency/${currency}`;
+    //console.log(countryAPI);
+    
+    let countryData = await axios.get(countryAPI);
+    
+    //console.log(countryData);
+    return countryData;
 };
 
-const getFinalConversion = async (value, baseCurrency, newCurrencies) => {
+var getFinalConversion = async (value, baseCurrency, newCurrencies) => {
     const rates = await getExchangeRates(baseCurrency, newCurrencies);
     const countryData = await getCountries(baseCurrency);
 
@@ -36,6 +45,7 @@ const getFinalConversion = async (value, baseCurrency, newCurrencies) => {
     }
 
     let countries = countryData.data.map(country => country.name);
+    //console.log(countries);
 
     return `${initialCurrency} is worth ${convertedValues.join(
         " / "
@@ -53,5 +63,5 @@ getFinalConversion(value, baseCurrency, newCurrencies)
 */
 
 module.exports = {
-    convert: getFinalConversion
+    getFinalConversion
 };
