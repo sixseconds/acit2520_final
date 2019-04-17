@@ -57,7 +57,7 @@ var convert = (value, baseCurrency, newCurrencies) => {
         }
     });
 };
-
+//test
 /*
 app.use((request, response, next) => {
     let time = new Date().toString();
