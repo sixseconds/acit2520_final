@@ -67,7 +67,7 @@ hbs.registerHelper("makeImages", imageLinks => {
 });
 
 hbs.registerHelper("makeCards", imageLinks => {
-    console.log(imageLinks)
+    //console.log(imageLinks)
     let cards = imageLinks.map(link => {
         return `<img class="d-inline w-25" src="${link}"/>`;
     });
@@ -115,7 +115,7 @@ app.get("/", async (request, response) => {
     try {
         let imageLinks = await nasa.getImages("mars");
         let cards = await deck.getDeck(12);
-        console.log(cards)
+        //console.log(cards)
 
         response.render("index.hbs", {
             title: pages[request.route.path],
@@ -138,7 +138,7 @@ app.get("/", async (request, response) => {
 app.post("/", async (request, response) => {
     let nasaSearch = request.body.nasaSearch;
     let draw = request.body.draw;
-    console.log(nasaSearch);
+    //console.log(nasaSearch);
     try {
         if (typeof nasaSearch === 'undefined') {
             nasaSearch = "Mars"
