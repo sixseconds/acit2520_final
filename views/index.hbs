@@ -10,7 +10,7 @@
         <div style="display: inline-block; text-align:center; max-width:50%; margin-left:25%; margin-right:25%">
             <h1 id="out">{{output}}</h1>
         </div>
-        <div class="container d-block w-50">
+        <div class="container d-block">
             {{!-- <form action="/" method="POST">
                 <fieldset>
                     <legend>Form</legend>
@@ -34,7 +34,7 @@
                 
             </form> --}}
             <div class="row">
-                <div id="tCarousel" class="carousel slide col-sm-12" data-ride="carousel">
+                <div id="tCarousel" class="carousel slide w-50" data-ride="carousel">
                     <div class="carousel-inner">
                         {{{makeImages imageLinks}}}
                     </div>
@@ -47,13 +47,23 @@
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
+                <div class="d-block w-50" style="overflow-y:scroll; max-height:60%">
+                    {{{makeCards cards}}}
+                </div>
             </div>
             <div class="row">
-                <form style="display: block; margin-left:20%; margin-right:20%" action="/" method="POST">
+                <form class="d-block w-50" action="/" method="POST">
                     <div style="display:flex; justify-content: space-between;">
                         <label for="nasa" style="display: inline-block; margin-right:1em">Search for NASA images:</label>
                         <input name="nasaSearch" id="nasa" style="display: inline-block;">
-                        <input type="submit" style="margin-right:1em">
+                        <input type="submit" style="margin-right:1em" value="Search">
+                    </div>
+                </form>
+                <form class="d-block w-50" action="/" method="POST">
+                    <div style="display:flex; justify-content: space-between;">
+                        <label for="drawSlider" style="display: inline-block; margin-right:1em">Draw cards:</label>
+                        <input type="number" name="draw" id="drawSlider" class="w-50" style="display: inline-block;" min="1" max="52">
+                        <input type="submit" style="margin-right:1em" value="Draw">
                     </div>
                 </form>
             </div>
