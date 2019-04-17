@@ -45,6 +45,7 @@ hbs.registerHelper("makeLinks", currentEndpoint => {
     return links.join(`\n`);
 });
 
+/*
 var convert = (value, baseCurrency, newCurrencies) => {
     currency.convert(value, baseCurrency, newCurrencies).then(conversion => {
         console.log(conversion);
@@ -57,6 +58,8 @@ var convert = (value, baseCurrency, newCurrencies) => {
         }
     });
 };
+*/
+
 //test
 /*
 app.use((request, response, next) => {
@@ -79,7 +82,7 @@ app.use((request, response, next) => {
 });
 */
 
-app.get("/index", async (request, response) => {
+app.get("/", async (request, response) => {
     response.render("index.hbs", {
         title: pages[request.route.path],
         currentEndpoint: request.route.path,
@@ -88,7 +91,7 @@ app.get("/index", async (request, response) => {
     //console.log(response);
 });
 
-app.post("/index", async (request, response) => {
+app.post("/", async (request, response) => {
     let baseCurrency = request.body.baseCurrency.toUpperCase();
     let newCurrencies = request.body.newCurrencies.toUpperCase().split(" ").join(",");
     let value = Number(request.body.value);
