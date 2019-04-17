@@ -49,6 +49,9 @@ hbs.registerHelper("makeLinks", currentEndpoint => {
 });
 
 hbs.registerHelper("makeImages", imageLinks => {
+    if (imageLinks.length === 0) {
+        return "No images for search!"
+    }
     let count = 0;
     let images = imageLinks.map(link => {
         if (count === 0) {
@@ -106,7 +109,7 @@ app.get("/", async (request, response) => {
         response.render("index.hbs", {
             title: pages[request.route.path],
             currentEndpoint: request.route.path,
-            output: "test",
+            output: "Mars",
             imageLinks: imageLinks
         });
     } catch (error) {
@@ -128,7 +131,7 @@ app.post("/", async (request, response) => {
         response.render("index.hbs", {
             title: pages[request.route.path],
             currentEndpoint: request.route.path,
-            output: "output",
+            output: `${nasaSearch}`,
             imageLinks: imageLinks
         });
     } catch (error) {
